@@ -80,9 +80,9 @@ def run_self_play(cmd_line_args=None):
     parser.add_argument("--model_json", help="Path to policy value model JSON.", default='network.json')
     parser.add_argument("--best_directory", help="Path to folder where the model params and metadata will be saved after each evaluation.", default='/../ckpt/best/weights.*.hdf5')  # noqa: E501/
     parser.add_argument("--data_directory", help="Path to folder where data for optimization are saved", default="/./data"),
-    parser.add_argument("--num_games", help="The number of games for evaluation", default=250, type=int),
+    parser.add_argument("--num_games", help="The number of games for evaluation", default=100, type=int),
     parser.add_argument("--resume", help="Load latest metadata", default=False, action="store_true")  # noqa: E501
-    parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=False, action="store_true")  # noqa: E501
+    parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=True, action="store_true")  # noqa: E501
     parser.add_argument("--playout_depth", help="Playout depth", default=5, type=int)
     parser.add_argument("--n_playout", help="number of playout", default=5, type=int)
 
@@ -101,16 +101,13 @@ def run_self_play(cmd_line_args=None):
         if len(best_weight_list) > 0:
             break
     best_weight_list.sort()
-    best_weight_path = best_weight_list[-1]
+    best_weight_path = ''
+    new_best_weight_path = best_weight_list[-1]
     while True:
-        best_weight_list = glob.glob(args.best_directory)
-        best_weight_list.sort()
-        new_best_weight_path = best_weight_list[-1]
-        if new_best_weight_path == best_weight_path and len(best_weight_list) > 1:
+        if new_best_weight_path == best_weight_path:
             pass
         else:
             best_weight_path = new_best_weight_path
-
             if args.verbose:
                 print("Self-playing with weights {}".format(best_weight_path))
 
@@ -165,6 +162,13 @@ def run_self_play(cmd_line_args=None):
             save_metadata()
             save_data_to_save()
             print("Self play data saved.")
+            del policy
+            del opp_policy
+
+        best_weight_list = glob.glob(args.best_directory)
+        best_weight_list.sort()
+        new_best_weight_path = best_weight_list[-1]
+
 
 
 if __name__ == '__main__':

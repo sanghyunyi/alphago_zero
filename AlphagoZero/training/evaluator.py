@@ -141,9 +141,11 @@ def run_evaluate(cmd_line_args=None):
                 game_history[i] = run_a_game(candid_player, best_player, i, boardsize)
                 del best_player
                 del candid_player
+            del policy
+            del candid_policy
 
             win_ratio = game_history.sum()/args.num_games
-            metadata["win_ratio"][best_weight_path] = [candid_weight_path, win_ratio]
+            metadata["win_ratio"][candid_weight_path] = [best_weight_path, win_ratio]
             save_metadata()
             print(win_ratio)
             if win_ratio > 0.55:
