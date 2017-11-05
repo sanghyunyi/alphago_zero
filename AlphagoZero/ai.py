@@ -18,7 +18,7 @@ class MCTSPlayer(object):
         self.is_human = False # for playing a game in play.py
 
     def get_move(self, state, self_play=False):
-        sensible_moves = [move for move in state.get_legal_moves(include_eyes=True)]
+        sensible_moves = [move for move in state.get_legal_moves()]
         if len(sensible_moves) > 0:
             move = self.mcts.get_move(state, self.temperature, self.self_play)
             if not self_play:

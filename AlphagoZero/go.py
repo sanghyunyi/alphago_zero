@@ -471,7 +471,7 @@ class GameState(object):
         # no ladder escape found
         return False
 
-    def get_legal_moves(self, include_eyes=True):
+    def get_legal_moves(self, include_eyes=False):
         if self.__legal_move_cache is not None:
             if include_eyes:
                 return self.__legal_move_cache + self.__legal_eyes_cache
