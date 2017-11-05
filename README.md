@@ -3,14 +3,12 @@ A reproduction Alphago Zero of "Mastering the game of Go without human knowledge
 This code is based on 'https://github.com/Rochester-NRT/RocAlphaGo'.
 
 ## train
-Run 
-train_optimization.py
-train_evaluator.py
-train_optimization.py
+Run train_optimization.py, train_evaluator.py and train_optimization.py simultaneously.
 
 ## play
 Playing with the best trained model.
-play_game.py
+
+python play_game.py
 
 ## TODO
 Implement resignation threshold in self play part.
