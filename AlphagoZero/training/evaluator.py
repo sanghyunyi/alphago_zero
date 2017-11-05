@@ -34,11 +34,11 @@ def run_a_game(new_player, old_player, i, boardsize, mock_state=[]):
     while not state.is_end_of_game:
         move = current.get_move(state,True)
 
-        print(move)
+        #print(move)
         childrens = current.mcts._root._children.items()
         actions, next_states = map(list, zip(*childrens))
         n_ = [next_state._n_visits for next_state in next_states]
-        print(zip(actions, n_))
+        #print(zip(actions, n_))
         current.mcts.update_with_move(move)
 
         state.do_move(move)
@@ -46,7 +46,7 @@ def run_a_game(new_player, old_player, i, boardsize, mock_state=[]):
         current, other = other, current
 
         pprint_board(state.board)
-    print(state.get_winner())
+    #print(state.get_winner())
     return state.get_winner() == new_player_color
 
 def run_evaluate(cmd_line_args=None):
