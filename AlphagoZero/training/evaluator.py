@@ -56,7 +56,6 @@ def run_evaluate(cmd_line_args=None):
     parser.add_argument("--best_directory", help="Path to folder where the model params and metadata will be saved after each evaluation.", default='/../ckpt/best/weights.*.hdf5')  # noqa: E501/
     parser.add_argument("--optimized_directory", help="Path to folder where optimized weights are saved", default="/../ckpt/optimized/weights.*.hdf5"),
     parser.add_argument("--num_games", help="The number of games for evaluation", default=40, type=int),
-    parser.add_argument("--resume", help="Load latest metadata", default=False, action="store_true")  # noqa: E501
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=False, action="store_true")  # noqa: E501
     parser.add_argument("--playout_depth", help="Playout depth", default=5, type=int)
     parser.add_argument("--n_playout", help="number of playout", default=5, type=int)
@@ -73,7 +72,7 @@ def run_evaluate(cmd_line_args=None):
     args.optimized_directory = os.path.dirname(__file__) + args.optimized_directory
     args.best_directory = os.path.dirname(__file__) + args.best_directory
 
-
+    args.resume = os.path.isfile(os.path.join(os.path.dirname(args.best_directory), "metadata.json"))
     if not args.resume:
         metadata = {
             "win_ratio": {}  # map from best_player to tuple of (candid_weight, win ratio)
