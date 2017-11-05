@@ -3,7 +3,7 @@ A reproduction of Alphago Zero in "Mastering the game of Go without human knowle
 
 This code is based on 'https://github.com/Rochester-NRT/RocAlphaGo'.
 
-Now the board size is 5.
+Now the board size is 5. (You can configure the size by changing board_size value.)
 
 ## train
 Run train.sh 
