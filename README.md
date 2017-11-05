@@ -1,5 +1,5 @@
 # alphago_zero
-A reproduction Alphago Zero of "Mastering the game of Go without human knowledge" using Tensorflow 1.3.
+A reproduction of Alphago Zero in "Mastering the game of Go without human knowledge" using Tensorflow 1.3.
 
 This code is based on 'https://github.com/Rochester-NRT/RocAlphaGo'.
 
