@@ -1,6 +1,9 @@
 # alphago_zero
 A reproduction Alphago Zero of "Mastering the game of Go without human knowledge" using Tensorflow 1.3.
+
 This code is based on 'https://github.com/Rochester-NRT/RocAlphaGo'.
+
+Now the board size is 5.
 
 ## train
 Run train_optimization.py, train_evaluator.py and train_optimization.py simultaneously.
