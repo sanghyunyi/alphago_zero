@@ -122,7 +122,8 @@ def run_self_play(cmd_line_args=None):
 
             if not args.resume:
                 metadata = {
-                    "model_file": args.model_json
+                    "model_file": args.model_json,
+                    "self_play_model":[]
                     }
             else:
                 with open(os.path.join(os.path.dirname(args.best_directory), "selfplaymetadata.json"), "r") as f:
@@ -157,7 +158,7 @@ def run_self_play(cmd_line_args=None):
                 data_to_save["reward"] += reward_list
                 del player
                 del opp_player
-            metadata["self_play_model"] = best_weight_path
+            metadata["self_play_model"] += [best_weight_path]
             save_metadata()
             save_data_to_save()
             print("Self play data saved.")
