@@ -57,12 +57,12 @@ def run_a_game(alphago_player, human_player, boardsize):
 
         pprint_board(state.board)
     winner = state.get_winner()
-    if winner == alphago_player:
-        print("Alphago won.")
+    if winner == human_color:
+        print("You won.")
     elif winner == 0:
         print("Tie.")
     else:
-        print("You won")
+        print("AlphagoZero won")
 
 def run_play(cmd_line_args=None):
     import argparse
