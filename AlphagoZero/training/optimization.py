@@ -36,9 +36,10 @@ def batch_generator_with_buffer(dataset_dir, batch_size, memory_size):
     replay_buffer = Memory(memory_size)
     preprocessor = Preprocess()
     dataset_dir = os.path.join(dataset_dir, '*.pkl')
-    data_path_set = set(glob.glob(dataset_dir))
+    dataset_dir_list = glob.glob(dataset_dir)
+    dataset_dir_list.sort()
     # Initialize memory with data from self_play
-    for data_path in data_path_set:
+    for data_path in dataset_dir_list:
         with open(data_path, 'r') as f:
             data = pickle.load(f)
             for i in range(len(data["state"])):
@@ -50,11 +51,13 @@ def batch_generator_with_buffer(dataset_dir, batch_size, memory_size):
     Xbatch = np.zeros(state_batch_shape)
     Y1batch = np.zeros((batch_size, game_size*game_size + 1)) # for policy
     Y2batch = np.zeros((batch_size, 1)) # for value
+    data_path_set = set(dataset_dir_list)
     while True:
         new_data_path_set = set(glob.glob(dataset_dir))
         only_new_data_path_set = new_data_path_set - data_path_set
         data_path_set = new_data_path_set
         for data_path in only_new_data_path_set:
+            print('new_data')
             with open(data_path, 'r') as f:
                 data = pickle.load(f)
                 for i in range(len(data["state"])):
@@ -123,7 +126,7 @@ def run_optimization(cmd_line_args=None):
     parser.add_argument("--train_data_directory", default="/./data", help="A .h5 file of training data")
     parser.add_argument("--out_directory", default="/../ckpt/optimized", help="directory where metadata and weights will be saved")
     parser.add_argument("--minibatch", "-B", help="Size of training data minibatches. Default: 16", type=int, default=16)  # noqa: E501
-    parser.add_argument("--memory_size", help="Size of replay buffer", type=int, default=1000)
+    parser.add_argument("--memory_size", help="Size of replay buffer", type=int, default=5000)
     parser.add_argument("--epoch_length", "-l", help="Number of training examples considered 'one epoch'. Default: # training data", type=int, default=1000)  # noqa: E501
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=False, action="store_true")  # noqa: E501
     # slightly fancier args

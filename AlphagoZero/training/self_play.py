@@ -82,8 +82,8 @@ def run_self_play(cmd_line_args=None):
     parser.add_argument("--data_directory", help="Path to folder where data for optimization are saved", default="/./data"),
     parser.add_argument("--num_games", help="The number of games for evaluation", default=100, type=int),
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=True, action="store_true")  # noqa: E501
-    parser.add_argument("--playout_depth", help="Playout depth", default=5, type=int)
-    parser.add_argument("--n_playout", help="number of playout", default=5, type=int)
+    parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
+    parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
 
     # Baseline function (TODO) default lambda state: 0  (receives either file
     # paths to JSON and weights or None, in which case it uses default baseline 0)

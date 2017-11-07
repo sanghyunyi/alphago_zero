@@ -57,8 +57,8 @@ def run_evaluate(cmd_line_args=None):
     parser.add_argument("--optimized_directory", help="Path to folder where optimized weights are saved", default="/../ckpt/optimized/weights.*.hdf5"),
     parser.add_argument("--num_games", help="The number of games for evaluation", default=40, type=int),
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=False, action="store_true")  # noqa: E501
-    parser.add_argument("--playout_depth", help="Playout depth", default=5, type=int)
-    parser.add_argument("--n_playout", help="number of playout", default=5, type=int)
+    parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
+    parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
     # Baseline function (TODO) default lambda state: 0  (receives either file
     # paths to JSON and weights or None, in which case it uses default baseline 0)
     if cmd_line_args is None:
@@ -147,7 +147,7 @@ def run_evaluate(cmd_line_args=None):
             metadata["win_ratio"][candid_weight_path] = [best_weight_path, win_ratio]
             save_metadata()
             print(win_ratio)
-            if win_ratio > 0.55:
+            if win_ratio >= 0.55:
                 print(candid_weight_path)
                 copy(candid_weight_path, os.path.dirname(best_weight_path))
                 print("The new best neural network!")
