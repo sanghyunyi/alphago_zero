@@ -14,14 +14,19 @@ class Human(object):
         self.board_size = board_size
 
     def get_move(self, state):
-        query = raw_input("Your move: ")
-        if len(query)==0:
-            return go.PASS_MOVE
-        else:
-            alphabet, number = re.match(r"([a-z]+)([0-9]+)", query, re.I).groups()
-            y = ord(alphabet.upper()) - ord('A')
-            x = self.board_size - int(number)
-            return ((x,y))
+        while True:
+            query = raw_input("Your move: ")
+            if len(query)==0:
+                return go.PASS_MOVE
+            else:
+                try:
+                    alphabet, number = re.match(r"([a-z]+)([0-9]+)", query, re.I).groups()
+                    y = ord(alphabet.upper()) - ord('A')
+                    x = self.board_size - int(number)
+                    return ((x,y))
+                except:
+                    print("The input should have the form like 'a1' or 'A1'.")
+                    continue
 
 def run_a_game(alphago_player, human_player, boardsize):
     '''Run num_games games to completion, keeping track of each position and move of the new_player.
@@ -70,8 +75,8 @@ def run_play(cmd_line_args=None):
     parser.add_argument("--model_json", help="Path to policy value model JSON.", default='network.json')
     parser.add_argument("--best_directory", help="Path to folder where the model params and metadata will be saved after each evaluation.", default='/../ckpt/best/weights.*.hdf5')  # noqa: E501/
     parser.add_argument("--optimized_directory", help="Path to folder where optimized weights are saved", default="/../ckpt/optimized/weights.*.hdf5"),
-    parser.add_argument("--playout_depth", help="Playout depth", default=5, type=int)
-    parser.add_argument("--n_playout", help="number of playout", default=5, type=int)
+    parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
+    parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
     # Baseline function (TODO) default lambda state: 0  (receives either file
     # paths to JSON and weights or None, in which case it uses default baseline 0)
     if cmd_line_args is None:
