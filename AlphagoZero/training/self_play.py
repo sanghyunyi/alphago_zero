@@ -80,7 +80,7 @@ def run_self_play(cmd_line_args=None):
     parser.add_argument("--model_json", help="Path to policy value model JSON.", default='network.json')
     parser.add_argument("--best_directory", help="Path to folder where the model params and metadata will be saved after each evaluation.", default='/../ckpt/best/weights.*.hdf5')  # noqa: E501/
     parser.add_argument("--data_directory", help="Path to folder where data for optimization are saved", default="/./data"),
-    parser.add_argument("--num_games", help="The number of games for evaluation", default=100, type=int),
+    parser.add_argument("--num_games", help="The number of games for evaluation", default=500, type=int),
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=True, action="store_true")  # noqa: E501
     parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
     parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
@@ -137,31 +137,31 @@ def run_self_play(cmd_line_args=None):
                 with open(os.path.join(os.path.dirname(args.best_directory), "selfplaymetadata.json"), "w") as f:
                     json.dump(metadata, f, sort_keys=True, indent=2)
 
-            data_to_save = {
-                    "state":[],
-                    "pi":[],
-                    "reward":[]
-                    }
-            def save_data_to_save():
-                with open(os.path.join(args.data_directory, os.path.basename(best_weight_path)+'.self_play.pkl'), "w") as f:
+            def save_data_to_save(data_to_save, i):
+                with open(os.path.join(args.data_directory, os.path.basename(best_weight_path)+'-{0:04d}'.format(i)+'.self_play.pkl'), "w") as f:
                     pickle.dump(data_to_save, f)
                     f.close()
 
             print("Start self play with "+best_weight_path)
             for i in range(args.num_games):
+                data_to_save = {
+                        "state":[],
+                        "pi":[],
+                        "reward":[]
+                        }
                 print(str(i) + "th self playing game")
                 player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state,playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=False, self_play=True)
                 opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=False, self_play=True)
                 state_list, pi_list, reward_list = self_play_and_save(opp_player, player, i, boardsize)
-                data_to_save["state"] += state_list
-                data_to_save["pi"] += pi_list
-                data_to_save["reward"] += reward_list
+                data_to_save["state"] = state_list
+                data_to_save["pi"] = pi_list
+                data_to_save["reward"] = reward_list
+                save_data_to_save(data_to_save, i)
+                print("Self play data saved.")
                 del player
                 del opp_player
             metadata["self_play_model"] += [best_weight_path]
             save_metadata()
-            save_data_to_save()
-            print("Self play data saved.")
             del policy
             del opp_policy
 
