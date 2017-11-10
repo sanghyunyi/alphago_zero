@@ -1,4 +1,4 @@
-import os, glob
+import os, glob, datetime
 import json
 import re
 import numpy as np
@@ -7,6 +7,29 @@ from AlphagoZero.ai import MCTSPlayer
 import AlphagoZero.go as go
 from AlphagoZero.models.policy_value import PolicyValue
 from AlphagoZero.util import flatten_idx, pprint_board
+
+def write_pgn(best_player, candid_player, history, directory):
+    txt = ''
+    for i, winner in enumerate(history):
+        txt += '[Event "evalator"]\n'
+        txt += '[Site ""]\n'
+        txt += '[Date "'+str(datetime.datetime.now())+'"]\n'
+        txt += '[Round "'+str(i)+'"]\n'
+        if i%2 == 0:
+            txt += '[White "'+best_player+'"]\n'
+            txt += '[Black "'+candid_player+'"]\n'
+        else:
+            txt += '[White "'+candid_player+'"]\n'
+            txt += '[Black "'+best_player+'"]\n'
+        if winner==go.BLACK:
+            txt += '[Result "0-1"]\n1. 0-1\n\n'
+        elif winner==go.WHITE:
+            txt += '[Result "1-0"]\n1. 1-0\n\n'
+        else:
+            txt += '[Result "1/2-1/2"]\n1. 1/2-1/2\n\n'
+    with open(directory, 'a') as f:
+        f.write(txt)
+        f.close()
 
 
 def run_a_game(new_player, old_player, i, boardsize, mock_state=[]):
@@ -46,8 +69,8 @@ def run_a_game(new_player, old_player, i, boardsize, mock_state=[]):
         current, other = other, current
 
         pprint_board(state.board)
-    #print(state.get_winner())
-    return state.get_winner() == new_player_color
+    winner = state.get_winner()
+    return winner, winner == new_player_color
 
 def run_evaluate(cmd_line_args=None):
     import argparse
@@ -133,11 +156,14 @@ def run_evaluate(cmd_line_args=None):
             candid_policy.model.load_weights(candid_weight_path)
 
             game_history = np.zeros((args.num_games))
+            game_history_pgn = np.zeros((args.num_games))
             for i in range(args.num_games):
                 print(str(i) + "th evaluating game")
                 best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=True)
                 candid_player= MCTSPlayer(candid_policy.eval_value_state, candid_policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=True)
-                game_history[i] = run_a_game(candid_player, best_player, i, boardsize)
+                winner, is_candid_win = run_a_game(candid_player, best_player, i, boardsize)
+                game_history_pgn[i] = winner
+                game_history[i] = is_candid_win
                 del best_player
                 del candid_player
             del policy
@@ -151,6 +177,7 @@ def run_evaluate(cmd_line_args=None):
                 print(candid_weight_path)
                 copy(candid_weight_path, os.path.dirname(best_weight_path))
                 print("The new best neural network!")
+                write_pgn(os.path.basename(best_weight_path), os.path.basename(candid_weight_path), game_history_pgn, os.path.join(os.path.dirname(best_weight_path), "eval.pgn"))
                 best_weight_path = os.path.join(os.path.dirname(best_weight_path), os.path.basename(candid_weight_path))
                 with open(best_model_json, 'r') as f:
                     js = json.load(f)
