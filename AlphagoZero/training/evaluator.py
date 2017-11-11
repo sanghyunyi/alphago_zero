@@ -11,7 +11,7 @@ from AlphagoZero.util import flatten_idx, pprint_board
 def write_pgn(best_player, candid_player, history, directory):
     txt = ''
     for i, winner in enumerate(history):
-        txt += '[Event "evalator"]\n'
+        txt += '[Event "evaluator"]\n'
         txt += '[Site ""]\n'
         txt += '[Date "'+str(datetime.datetime.now())+'"]\n'
         txt += '[Round "'+str(i)+'"]\n'
