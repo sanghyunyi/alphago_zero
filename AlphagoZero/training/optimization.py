@@ -38,13 +38,14 @@ def batch_generator_with_buffer(dataset_dir, batch_size, memory_size):
     dataset_dir = os.path.join(dataset_dir, '*.pkl')
     dataset_dir_list = glob.glob(dataset_dir)
     dataset_dir_list.sort()
+    #print(dataset_dir_list)
     # Initialize memory with data from self_play
     for data_path in dataset_dir_list:
         with open(data_path, 'r') as f:
             data = pickle.load(f)
+            f.close()
             for i in range(len(data["state"])):
                 replay_buffer.add_event(Event(data["state"][i], data["pi"][i], data["reward"][i]))
-            f.close()
     game_size = replay_buffer.sample(1)[0].state.size
     output_dim = preprocessor.output_dim
     state_batch_shape = (batch_size, output_dim, game_size, game_size)
@@ -60,9 +61,9 @@ def batch_generator_with_buffer(dataset_dir, batch_size, memory_size):
             print('new_data')
             with open(data_path, 'r') as f:
                 data = pickle.load(f)
+                f.close()
                 for i in range(len(data["state"])):
                     replay_buffer.add_event(Event(data["state"][i], data["pi"][i], data["reward"][i]))
-                f.close()
         batch_list = replay_buffer.sample(batch_size)
         for batch_idx, batch in enumerate(batch_list):
             transform = random_transform()
@@ -125,8 +126,8 @@ def run_optimization(cmd_line_args=None):
     parser.add_argument("--model", default='network.json', help="Path to a JSON model file (i.e. from PolicyValue.save_model())")  # noqa: E501
     parser.add_argument("--train_data_directory", default="/./data", help="A .h5 file of training data")
     parser.add_argument("--out_directory", default="/../ckpt/optimized", help="directory where metadata and weights will be saved")
-    parser.add_argument("--minibatch", "-B", help="Size of training data minibatches. Default: 16", type=int, default=16)  # noqa: E501
-    parser.add_argument("--memory_size", help="Size of replay buffer", type=int, default=5000)
+    parser.add_argument("--minibatch", "-B", help="Size of training data minibatches. Default: 16", type=int, default=32)  # noqa: E501
+    parser.add_argument("--memory_size", help="Size of replay buffer", type=int, default=50000)
     parser.add_argument("--epoch_length", "-l", help="Number of training examples considered 'one epoch'. Default: # training data", type=int, default=1000)  # noqa: E501
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=False, action="store_true")  # noqa: E501
     # slightly fancier args
