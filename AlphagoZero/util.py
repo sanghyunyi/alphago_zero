@@ -75,17 +75,15 @@ def pprint_board(board):
         print(out)
     print(out0)
 
-def plot_network_output(scores, board, history, out_directory, output_file,
-                        should_plot=False, western_column_notation=True):
+
+def plot_board(board, history, out_directory, output_file, should_plot=False, western_column_notation=True):
     try:
         import matplotlib
+        matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         import matplotlib.cm as cm
     except ImportError as e:
-        print(
-            'Failed to import matplotlib. This is an optional dependency of ' +
-            'the RocAlphaGo project, so it is not included in the requirements file. ' +
-            'You must install matplotlib yourself to use the plotting functions.')
+        print('Failed to import matplotlib.')
         raise e
 
     from distutils.version import StrictVersion
@@ -95,8 +93,8 @@ def plot_network_output(scores, board, history, out_directory, output_file,
 
     # Initial matplotlib setup
     fig, ax = plt.subplots(figsize=(10, 10))
-    plt.xlim([0, board.size + 1])
-    plt.ylim([0, board.size + 1])
+    plt.xlim([0, board.shape[0] + 1])
+    plt.ylim([0, board.shape[1] + 1])
 
     # Wooden background color
     ax.set_axis_bgcolor('#fec97b')
@@ -106,70 +104,43 @@ def plot_network_output(scores, board, history, out_directory, output_file,
     ax.tick_params(axis='both', length=0, width=0)
     # Western notation has the origin at the lower-left
     if western_column_notation:
-        plt.xticks(range(1, board.size + 1), range(1, board.size + 1))
-        plt.yticks(range(1, board.size + 1), reversed(range(1, board.size + 1)))
+        plt.xticks(range(1, board.shape[0] + 1), range(1, board.shape[0] + 1))
+        plt.yticks(range(1, board.shape[1] + 1), reversed(range(1, board.shape[1] + 1)))
     # Traditional has the origin at the upper-left and uses letters minus 'I' along the top
     else:
         ax.xaxis.tick_top()
-        plt.xticks(range(1, board.size + 1), [x for x in LETTERS[:board.size + 1] if x != 'I'])
-        plt.yticks(range(1, board.size + 1), range(1, board.size + 1))
+        plt.xticks(range(1, board.shape[0] + 1), [x for x in LETTERS[:board.shape[0] + 1] if x != 'I'])
+        plt.yticks(range(1, board.shape[1] + 1), range(1, board.shape[1] + 1))
 
     # Draw grid
-    for i in range(board.size):
-        plt.plot([1, board.size], [i + 1, i + 1], lw=1, color='k', zorder=0)
-    for i in range(board.size):
-        plt.plot([i + 1, i + 1], [1, board.size], lw=1, color='k', zorder=0)
-
-    # Display network heat plots
-    reshaped = np.reshape(scores, (board.size, board.size))
-    score_x_coords = []
-    score_y_coords = []
-    score_values = []
-    for i in range(board.size):
-        for j in range(board.size):
-            if reshaped[i][j] * 100 >= 0.1:
-                score_x_coords.append(i + 1)
-                score_y_coords.append(j + 1)
-                score_values.append(reshaped[i][j])
-    min_seen = np.amin(scores)
-    max_seen = np.amax(scores)
-    norm = matplotlib.colors.Normalize(vmin=min_seen, vmax=max_seen)
-    coloring = cm.ScalarMappable(norm=norm, cmap=cm.cool).to_rgba(score_values)
-    plt.scatter(score_x_coords, score_y_coords, marker='o', s=700,
-                c=coloring, edgecolor='k', zorder=1)
-
-    # Display network scores on heat plots
-    for i, txt in enumerate(score_values):
-        ax.annotate('{0:.1f}'.format(txt * 100), (score_x_coords[i], score_y_coords[i]),
-                    color='k', ha='center',
-                    va='center', size=10, zorder=3)
+    for i in range(board.shape[0]):
+        plt.plot([1, board.shape[0]], [i + 1, i + 1], lw=1, color='k', zorder=0)
+    for i in range(board.shape[1]):
+        plt.plot([i + 1, i + 1], [1, board.shape[1]], lw=1, color='k', zorder=0)
 
     # Display stones already played
     stone_x_coords = []
     stone_y_coords = []
     stone_colors = []
-    for i in range(board.size):
-        for j in range(board.size):
+    for i in range(board.shape[0]):
+        for j in range(board.shape[1]):
             if board[i][j] != go.EMPTY:
                 stone_x_coords.append(i + 1)
                 stone_y_coords.append(j + 1)
                 if board[i][j] == go.BLACK:
-                    stone_colors.append(plt.to_rgb('black'))
+                    stone_colors.append('black')
                 else:
-                    stone_colors.append(plt.to_rgb('white'))
+                    stone_colors.append('w')
     plt.scatter(stone_x_coords, stone_y_coords, marker='o', edgecolors='k',
-                s=700, c=stone_colors, zorder=4)
+                s=700, c=stone_colors, zorder=3)
 
-    # Place red marker on last move if it exists
-    if len(history) != 0:
-        # If last move was not pass
-        if history[-1] != go.PASS_MOVE:
-            last_move = history[-1]
-            x_coord = last_move[0] + 1
-            y_coord = last_move[1] + 1
-            last_move = (x_coord, y_coord)
-            plt.scatter(last_move[0], last_move[1], marker='s', color='r',
-                        edgecolors='k', s=100, zorder=5)
+    # Display numbers on stones
+    for i, action in enumerate(history):
+        if action != go.PASS_MOVE:
+            if i%2 == 0:
+                plt.text(action[0]+1, action[1]+1, str(i+1), ha='center', va='center', color='w')
+            else:
+                plt.text(action[0]+1, action[1]+1, str(i+1), ha='center', va='center', color='black')
 
     if output_file is not None:
         plt.savefig(os.path.join(out_directory, output_file), bbox_inches='tight')
