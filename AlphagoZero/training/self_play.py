@@ -10,7 +10,7 @@ from AlphagoZero.util import flatten_idx, pprint_board
 from AlphagoZero.preprocessing import preprocessing
 
 
-def self_play_and_save(player, opp_player, i, boardsize, mock_state=[]):
+def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
     '''Run num_games games to completion, keeping track of each position and move of the new_player.
     And save the game data
 
@@ -26,14 +26,9 @@ def self_play_and_save(player, opp_player, i, boardsize, mock_state=[]):
     if mock_state:
         state = mock_state
 
-    # Start all odd games with moves by 'old_player'. Even games will have 'new_player' black.
-    player_color = go.BLACK if i % 2 == 0 else go.WHITE
-    if player_color == go.BLACK:
-        current = player
-        other = opp_player
-    else:
-        current = opp_player
-        other = player
+    player_color = go.BLACK
+    current = player
+    other = opp_player
 
     step = 0
     while not state.is_end_of_game:
@@ -82,7 +77,6 @@ def run_self_play(cmd_line_args=None):
     parser.add_argument("--data_directory", help="Path to folder where data for optimization are saved", default="/./data"),
     parser.add_argument("--num_games", help="The number of games for evaluation", default=500, type=int),
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=True, action="store_true")  # noqa: E501
-    parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
     parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
 
     # Baseline function (TODO) default lambda state: 0  (receives either file
@@ -150,9 +144,9 @@ def run_self_play(cmd_line_args=None):
                         "reward":[]
                         }
                 print(str(i) + "th self playing game")
-                player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state,playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=False, self_play=True)
-                opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=False, self_play=True)
-                state_list, pi_list, reward_list = self_play_and_save(opp_player, player, i, boardsize)
+                player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=args.n_playout, evaluating=False, self_play=True)
+                opp_player= MCTSPlayer(opp_policy.eval_value_state, opp_policy.eval_policy_state, n_playout=args.n_playout, evaluating=False, self_play=True)
+                state_list, pi_list, reward_list = self_play_and_save(opp_player, player, boardsize)
                 data_to_save["state"] = state_list
                 data_to_save["pi"] = pi_list
                 data_to_save["reward"] = reward_list

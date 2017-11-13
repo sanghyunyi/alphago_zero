@@ -5,8 +5,8 @@ from AlphagoZero import mcts
 from operator import itemgetter
 
 class MCTSPlayer(object):
-    def __init__(self, value_function, policy_function, c_puct=5, playout_depth=20, n_playout=1600, evaluating=True, self_play=False):
-        self.mcts = mcts.MCTS(value_function, policy_function, c_puct, playout_depth, n_playout)
+    def __init__(self, value_function, policy_function, c_puct=5, n_playout=1600, evaluating=True, self_play=False):
+        self.mcts = mcts.MCTS(value_function, policy_function, c_puct, n_playout)
         self.move_count = 0
         self.evaluating = evaluating
         self.self_play = self_play

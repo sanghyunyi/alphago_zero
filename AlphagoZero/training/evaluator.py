@@ -80,7 +80,6 @@ def run_evaluate(cmd_line_args=None):
     parser.add_argument("--optimized_directory", help="Path to folder where optimized weights are saved", default="/../ckpt/optimized/weights.*.hdf5"),
     parser.add_argument("--num_games", help="The number of games for evaluation", default=40, type=int),
     parser.add_argument("--verbose", "-v", help="Turn on verbose mode", default=False, action="store_true")  # noqa: E501
-    parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
     parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
     # Baseline function (TODO) default lambda state: 0  (receives either file
     # paths to JSON and weights or None, in which case it uses default baseline 0)
@@ -159,10 +158,10 @@ def run_evaluate(cmd_line_args=None):
             game_history_pgn = np.zeros((args.num_games))
             for i in range(args.num_games):
                 print(str(i) + "th evaluating game")
-                best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=True)
-                candid_player= MCTSPlayer(candid_policy.eval_value_state, candid_policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=True)
+                best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=args.n_playout, evaluating=True)
+                candid_player= MCTSPlayer(candid_policy.eval_value_state, candid_policy.eval_policy_state, n_playout=args.n_playout, evaluating=True)
                 winner, is_candid_win = run_a_game(candid_player, best_player, i, boardsize)
-                game_history_pgn[i] = winner
+                game_history_pgn[i]  = winner
                 game_history[i] = is_candid_win
                 del best_player
                 del candid_player

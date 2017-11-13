@@ -112,7 +112,7 @@ class MCTS(object):
     The term "playout" refers to a single search from the root.
     """
 
-    def __init__(self, value_fn, policy_fn, c_puct=5, playout_depth=20, n_playout=1600):
+    def __init__(self, value_fn, policy_fn, c_puct=5, n_playout=1600):
         """Arguments:
         value_fn -- a function that takes in a state and ouputs a score in [-1, 1], i.e. the
             expected value of the end game score from the current player's perspective.
@@ -126,17 +126,15 @@ class MCTS(object):
         self._value = value_fn
         self._policy = policy_fn
         self._c_puct = c_puct
-        self._L = playout_depth
         self._n_playout = n_playout
 
-    def _playout(self, state, leaf_depth, self_play):
+    def _playout(self, state, self_play):
         """Run a single playout from the root to the given depth, getting a value at the leaf and
         propagating it back through its parents. State is modified in-place, so a copy must be
         provided.
 
         Arguments:
         state -- a copy of the state.
-        leaf_depth -- after this many moves, leaves are evaluated.
         self_play -- whether this is on self_play or not
 
         Returns:
@@ -156,7 +154,7 @@ class MCTS(object):
             #print("second")
             #print(zip(a, [_c._P for _c in c]))
 
-        for i in range(leaf_depth):
+        while True:
             # Only expand node if it has not already been done. Existing nodes already know their
             # prior.
             if node.is_leaf():
@@ -174,6 +172,7 @@ class MCTS(object):
                         j += 1
                     action_probs = new_action_probs
                 node.expand(action_probs)
+                break
             # Greedily select next move.
             action, node = node.select()
             state.do_move(action)
@@ -196,7 +195,7 @@ class MCTS(object):
         """
         for n in range(self._n_playout):
             state_copy = state.copy()
-            self._playout(state_copy, self._L, self_play)
+            self._playout(state_copy, self_play)
 
         # action is chosen proportional to its exponentiated visit count
         if temperature > 0:
