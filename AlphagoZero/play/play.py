@@ -75,7 +75,6 @@ def run_play(cmd_line_args=None):
     parser.add_argument("--model_json", help="Path to policy value model JSON.", default='network.json')
     parser.add_argument("--best_directory", help="Path to folder where the model params and metadata will be saved after each evaluation.", default='/../ckpt/best/weights.*.hdf5')  # noqa: E501/
     parser.add_argument("--optimized_directory", help="Path to folder where optimized weights are saved", default="/../ckpt/optimized/weights.*.hdf5"),
-    parser.add_argument("--playout_depth", help="Playout depth", default=7, type=int)
     parser.add_argument("--n_playout", help="number of playout", default=7, type=int)
     # Baseline function (TODO) default lambda state: 0  (receives either file
     # paths to JSON and weights or None, in which case it uses default baseline 0)
@@ -122,7 +121,7 @@ def run_play(cmd_line_args=None):
     policy = PolicyValue.load_model(best_model_json)
     policy.model.load_weights(best_weight_path)
     boardsize = policy.model.input_shape[-1]
-    best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, playout_depth=args.playout_depth, n_playout=args.n_playout, evaluating=True)
+    best_player = MCTSPlayer(policy.eval_value_state, policy.eval_policy_state, n_playout=args.n_playout, evaluating=True)
     human_player = Human(boardsize)
     run_a_game(best_player, human_player, boardsize)
 
