@@ -88,6 +88,11 @@ def run_self_play(cmd_line_args=None):
     args.model_json = os.path.dirname(__file__) + os.path.join(os.path.dirname(args.best_directory), args.model_json)
     args.best_directory = os.path.dirname(__file__) + args.best_directory
     args.data_directory = os.path.dirname(__file__) + args.data_directory
+
+    if not os.path.exists(os.path.dirname(args.data_directory)):
+        os.makedirs(os.path.dirname(args.data_directory))
+
+
     args.resume = os.path.isfile(os.path.join(os.path.dirname(args.best_directory), "selfplaymetadata.json"))
     while True:
         best_weight_list = glob.glob(args.best_directory)

@@ -94,6 +94,9 @@ def run_evaluate(cmd_line_args=None):
     args.optimized_directory = os.path.dirname(__file__) + args.optimized_directory
     args.best_directory = os.path.dirname(__file__) + args.best_directory
 
+    if not os.path.exists(os.path.dirname(args.best_directory)):
+        os.makedirs(os.path.dirname(args.best_directory))
+
     args.resume = os.path.isfile(os.path.join(os.path.dirname(args.best_directory), "metadata.json"))
     if not args.resume:
         metadata = {
