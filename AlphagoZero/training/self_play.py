@@ -89,8 +89,8 @@ def run_self_play(cmd_line_args=None):
     args.best_directory = os.path.dirname(__file__) + args.best_directory
     args.data_directory = os.path.dirname(__file__) + args.data_directory
 
-    if not os.path.exists(os.path.dirname(args.data_directory)):
-        os.makedirs(os.path.dirname(args.data_directory))
+    if not os.path.exists(args.data_directory):
+        os.makedirs(args.data_directory)
 
 
     args.resume = os.path.isfile(os.path.join(os.path.dirname(args.best_directory), "selfplaymetadata.json"))
