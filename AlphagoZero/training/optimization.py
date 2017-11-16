@@ -41,11 +41,16 @@ def batch_generator_with_buffer(dataset_dir, batch_size, memory_size):
     #print(dataset_dir_list)
     # Initialize memory with data from self_play
     for data_path in dataset_dir_list:
-        with open(data_path, 'r') as f:
-            data = pickle.load(f)
-            f.close()
-            for i in range(len(data["state"])):
-                replay_buffer.add_event(Event(data["state"][i], data["pi"][i], data["reward"][i]))
+        while True:
+            try:
+                with open(data_path, 'r') as f:
+                    data = pickle.load(f)
+                    f.close()
+                    break
+            except:
+                continue
+        for i in range(len(data["state"])):
+            replay_buffer.add_event(Event(data["state"][i], data["pi"][i], data["reward"][i]))
     game_size = replay_buffer.sample(1)[0].state.size
     output_dim = preprocessor.output_dim
     state_batch_shape = (batch_size, output_dim, game_size, game_size)
@@ -59,11 +64,16 @@ def batch_generator_with_buffer(dataset_dir, batch_size, memory_size):
         data_path_set = new_data_path_set
         for data_path in only_new_data_path_set:
             print('new_data')
-            with open(data_path, 'r') as f:
-                data = pickle.load(f)
-                f.close()
-                for i in range(len(data["state"])):
-                    replay_buffer.add_event(Event(data["state"][i], data["pi"][i], data["reward"][i]))
+            while True:
+                try:
+                    with open(data_path, 'r') as f:
+                        data = pickle.load(f)
+                        f.close()
+                        break
+                except:
+                    continue
+            for i in range(len(data["state"])):
+                replay_buffer.add_event(Event(data["state"][i], data["pi"][i], data["reward"][i]))
         batch_list = replay_buffer.sample(batch_size)
         for batch_idx, batch in enumerate(batch_list):
             transform = random_transform()
