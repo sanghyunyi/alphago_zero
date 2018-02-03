@@ -39,15 +39,15 @@ def self_play_and_save(player, opp_player, boardsize, mock_state=[]):
         #print(childrens)
         actions, next_states = map(list, zip(*childrens))
         _n_visits = [next_state._n_visits for next_state in next_states]
-        #if not move == go.PASS_MOVE:
-        if step < 25: # temperature is considered to be 1
-            distribution = np.divide(_n_visits, np.sum(_n_visits))
-        else:
-            max_visit_idx = np.argmax(_n_visits)
+        if not move == go.PASS_MOVE:
+            if step < 25: # temperature is considered to be 1
+                distribution = np.divide(_n_visits, np.sum(_n_visits))
+            else:
+                max_visit_idx = np.argmax(_n_visits)
+                distribution = np.zeros(np.shape(_n_visits))
+                distribution[max_visit_idx] = 1.0
+        else: # to prevent the model from overfitting to PASS_MOVE
             distribution = np.zeros(np.shape(_n_visits))
-            distribution[max_visit_idx] = 1.0
-        #else: # to prevent the model from overfitting to PASS_MOVE
-        #    distribution = np.zeros(np.shape(_n_visits))
         pi = zip(actions, distribution)
         #print(zip(actions, _n_visits))
         state_list.append(state.copy())
